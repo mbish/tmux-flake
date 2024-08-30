@@ -1593,11 +1593,11 @@
         "vim": "vim"
       },
       "locked": {
-        "lastModified": 1725043781,
-        "narHash": "sha256-unoQRzUjuyWtiM6ZH5CnVf/WRCF2DS5TYTBtSwjKQaQ=",
+        "lastModified": 1725046900,
+        "narHash": "sha256-+1le8rFfIDcwMg2Qw0ata+rTNeaTs8UYYakrwli3pA4=",
         "owner": "mbish",
         "repo": "zsh-flake",
-        "rev": "28931debc6085a646ca5172e8945db08c3d8615f",
+        "rev": "ef762e9f2c4a7c6d1e661750b930d8507077688a",
         "type": "github"
       },
       "original": {

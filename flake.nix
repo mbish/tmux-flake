@@ -17,20 +17,36 @@
       overlays = [
       ];
     };
-    tmuxConf = import ./tmux.nix {
-      pkgs = pkgs;
-      lib = pkgs.lib;
+    fullConf = import ./tmux.nix {
+      inherit pkgs;
+      inherit (pkgs) lib;
       zsh = zsh-flake;
+      shell = "${zsh-flake.packages.${system}.default}/bin/zsh";
       inherit system;
     };
-    tmux = pkgs.writeShellScriptBin "tmux" ''
-      ${pkgs.tmux}/bin/tmux -f ${tmuxConf}
-    '';
+    mkTmux = tmuxConf:
+      pkgs.writeShellScriptBin "tmux" ''
+        ${pkgs.tmux}/bin/tmux -f ${tmuxConf}
+      '';
+    minimalTmuxConf = import ./tmux.nix {
+      inherit pkgs;
+      inherit (pkgs) lib;
+      shell = "${zsh-flake.packages.${system}.minimal}/bin/zsh";
+      inherit system;
+    };
+    localTmuxConf = import ./tmux.nix {
+      inherit pkgs;
+      inherit (pkgs) lib;
+      shell = "bash";
+      inherit system;
+    };
   in {
     packages = {
-      x86_64-linux = rec {
-        inherit tmux;
-        default = tmux;
+      x86_64-linux = {
+        tmux = mkTmux fullConf;
+        default = mkTmux fullConf;
+        minimal = mkTmux minimalTmuxConf;
+        local = mkTmux localTmuxConf;
       };
     };
   };
