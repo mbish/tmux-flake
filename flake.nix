@@ -37,7 +37,7 @@
     localTmuxConf = import ./tmux.nix {
       inherit pkgs;
       inherit (pkgs) lib;
-      shell = "bash";
+      shell = "$SHELL";
       inherit system;
     };
   in {
