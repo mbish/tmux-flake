@@ -18,27 +18,24 @@
       ];
     };
     fullConf = import ./tmux.nix {
-      inherit pkgs;
+      inherit pkgs system;
       inherit (pkgs) lib;
       zsh = zsh-flake;
       shell = "${zsh-flake.packages.${system}.default}/bin/zsh";
-      inherit system;
     };
     mkTmux = tmuxConf:
       pkgs.writeShellScriptBin "tmux" ''
         ${pkgs.tmux}/bin/tmux -f ${tmuxConf}
       '';
     minimalTmuxConf = import ./tmux.nix {
-      inherit pkgs;
+      inherit pkgs system;
       inherit (pkgs) lib;
       shell = "${zsh-flake.packages.${system}.minimal}/bin/zsh";
-      inherit system;
     };
     localTmuxConf = import ./tmux.nix {
-      inherit pkgs;
+      inherit pkgs system;
       inherit (pkgs) lib;
       shell = "$SHELL";
-      inherit system;
     };
   in {
     packages = {
