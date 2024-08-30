@@ -1,9 +1,11 @@
 {
   pkgs,
   lib,
+  zsh,
+  system,
   ...
 }: let
-  zshBin = "${pkgs.zsh}/bin/zsh";
+  zshBin = "${zsh.packages.${system}.default}/bin/zsh";
   tmuxinatorBin = "${pkgs.tmuxinator}/bin/tmuxinator";
   egrepBin = "${pkgs.gnugrep}/bin/egrep";
   perlBin = "${pkgs.perl}/bin/perl";
