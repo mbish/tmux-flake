@@ -30,7 +30,7 @@
       };
       mkTmux = tmuxConf:
         pkgs.writeShellScriptBin "tmux" ''
-          ${pkgs.tmux}/bin/tmux -f ${tmuxConf}
+          ${pkgs.tmux}/bin/tmux -f ${tmuxConf} $@
         '';
       minimalTmuxConf = import ./tmux.nix {
         inherit pkgs system;
