@@ -3,7 +3,6 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    zsh-flake.url = "github:mbish/zsh-flake";
     flake-utils = {
       url = "github:numtide/flake-utils";
     };
@@ -11,7 +10,6 @@
 
   outputs = {
     self,
-    zsh-flake,
     nixpkgs,
     flake-utils,
   }: let
@@ -22,32 +20,37 @@
         overlays = [
         ];
       };
-      fullConf = import ./tmux.nix {
-        inherit pkgs system;
-        inherit (pkgs) lib;
-        zsh = zsh-flake;
-        shell = "${zsh-flake.packages.${system}.default}/bin/zsh";
-      };
-      mkTmux = tmuxConf:
-        pkgs.writeShellScriptBin "tmux" ''
-          ${pkgs.tmux}/bin/tmux -f ${tmuxConf} $@
-        '';
-      minimalTmuxConf = import ./tmux.nix {
-        inherit pkgs system;
-        inherit (pkgs) lib;
-        shell = "${zsh-flake.packages.${system}.minimal}/bin/zsh";
-      };
-      localTmuxConf = import ./tmux.nix {
-        inherit pkgs system;
-        inherit (pkgs) lib;
-        shell = "$SHELL";
-      };
+      fullConf = ./tmux.conf;
+      mkTmux = let
+        packagesInExe = [
+          pkgs.tmuxinator
+          pkgs.gnugrep
+          pkgs.perl
+          pkgs.xclip
+          pkgs.powerline
+        ];
+      in
+      config:
+        pkgs.stdenv.mkDerivation {
+          name = "tmux-custom";
+
+          nativeBuildInputs = [ pkgs.makeWrapper ];
+          phases = ["installPhase"];
+          installPhase = ''
+            mkdir -p $out/share
+            mkdir -p $out/bin
+            cp ${config} $out/share/tmux.conf
+            cp ${pkgs.tmux}/bin/tmux $out/bin/tmux
+            wrapProgram $out/bin/tmux \
+              --prefix PATH : ${pkgs.lib.makeBinPath packagesInExe} \
+              --add-flags -f --add-flags $out/share/tmux.conf \
+              --set LOCALE_ARCHIVE ${pkgs.glibcLocales}/lib/locale/locale-archive
+          '';
+        };
     in {
-      packages = {
+      packages = rec {
         tmux = mkTmux fullConf;
-        default = mkTmux fullConf;
-        minimal = mkTmux minimalTmuxConf;
-        local = mkTmux localTmuxConf;
+        default = tmux;
       };
     };
   in

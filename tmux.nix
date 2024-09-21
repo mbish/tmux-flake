@@ -1,20 +1,12 @@
 {
   pkgs,
   lib,
-  shell,
   ...
-}: let
-  tmuxinatorBin = "${pkgs.tmuxinator}/bin/tmuxinator";
-  egrepBin = "${pkgs.gnugrep}/bin/egrep";
-  perlBin = "${pkgs.perl}/bin/perl";
-  xclipBin = "${pkgs.xclip}/bin/xclip";
-  powerlineConfigBin = "${pkgs.powerline}/bin/powerline-config";
-  powerlineDaemonBin = "${pkgs.powerline}/bin/powerline-daemon";
-in
+}:
   pkgs.writeTextFile {
     name = "tmux.conf";
     text = ''
-      set-option -g default-shell ${shell}
+      set-option -g default-shell $SHELL
       set -g history-limit 1000000
       set -g default-terminal "tmux-256color"
       set -ga terminal-overrides ",*256col*:Tc"
@@ -54,13 +46,13 @@ in
       bind-key C-c new-window -c'#{pane_current_path}'
       bind-key C-m setw monitor-silence 30
       bind-key C-l setw monitor-silence 120
-      bind-key C-j command-prompt -p "mux start" "run-shell -t 9 '${tmuxinatorBin} start %%'"
+      bind-key C-j command-prompt -p "mux start" "run-shell -t 9 'tmuxinator start %%'"
       bind-key -n C-Space last-window
       setw -g mouse off
 
       # Set status bar
       set -g status-left '#[fg=green]#S'
-      set -g status-right '#[fg=yellow]#(uptime | ${egrepBin} -o "[0-9]+ users?, +load.*"|${perlBin} -pe "s| averages?||"), %H:%M'
+      set -g status-right '#[fg=yellow]#(uptime | egrep -o "[0-9]+ users?, +load.*"|perl -pe "s| averages?||"), %H:%M'
       set-window-option -g aggressive-resize
 
       # Highlight active window
@@ -68,10 +60,10 @@ in
       bind-key -T copy-mode-vi 'v' send -X begin-selection
       set -s escape-time 0
       set -g focus-events on
-      bind -T copy-mode-vi 'y' send-keys -X copy-pipe-and-cancel "${xclipBin} -i -f -selection primary | ${xclipBin} -i -selection clipboard"
-      bind -T copy-mode-vi Enter send-keys -X copy-pipe-and-cancel "${xclipBin} -i -f -selection primary | ${xclipBin} -i -selection clipboard"
-      run-shell '${powerlineDaemonBin} -q'
-      run-shell '${powerlineConfigBin} tmux setup'
+      bind -T copy-mode-vi 'y' send-keys -X copy-pipe-and-cancel "xclip -i -f -selection primary | xclip -i -selection clipboard"
+      bind -T copy-mode-vi Enter send-keys -X copy-pipe-and-cancel "xclip -i -f -selection primary | xclip -i -selection clipboard"
+      run-shell 'powerline-daemon -q'
+      run-shell 'powerline-config tmux setup'
       # ################################################
       set-option -g status-interval 1
     '';
