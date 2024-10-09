@@ -28,25 +28,26 @@
           pkgs.perl
           pkgs.xclip
           pkgs.powerline
+          pkgs.tmux
         ];
       in
-      config:
-        pkgs.stdenv.mkDerivation {
-          name = "tmux-custom";
+        config:
+          pkgs.stdenv.mkDerivation {
+            name = "tmux-custom";
 
-          nativeBuildInputs = [ pkgs.makeWrapper ];
-          phases = ["installPhase"];
-          installPhase = ''
-            mkdir -p $out/share
-            mkdir -p $out/bin
-            cp ${config} $out/share/tmux.conf
-            cp ${pkgs.tmux}/bin/tmux $out/bin/tmux
-            wrapProgram $out/bin/tmux \
-              --prefix PATH : ${pkgs.lib.makeBinPath packagesInExe} \
-              --add-flags -f --add-flags $out/share/tmux.conf \
-              --set LOCALE_ARCHIVE ${pkgs.glibcLocales}/lib/locale/locale-archive
-          '';
-        };
+            nativeBuildInputs = [pkgs.makeWrapper];
+            phases = ["installPhase"];
+            installPhase = ''
+              mkdir -p $out/share
+              mkdir -p $out/bin
+              cp ${config} $out/share/tmux.conf
+              cp ${pkgs.tmux}/bin/tmux $out/bin/tmux
+              wrapProgram $out/bin/tmux \
+                --prefix PATH : ${pkgs.lib.makeBinPath packagesInExe} \
+                --add-flags -f --add-flags $out/share/tmux.conf \
+                --set LOCALE_ARCHIVE ${pkgs.glibcLocales}/lib/locale/locale-archive
+            '';
+          };
     in {
       packages = rec {
         tmux = mkTmux fullConf;
