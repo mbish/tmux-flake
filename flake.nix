@@ -48,13 +48,13 @@
                 --set LOCALE_ARCHIVE ${pkgs.glibcLocales}/lib/locale/locale-archive
             '';
           };
-    in {
+    in rec {
       packages = rec {
         tmux = mkTmux fullConf;
         default = tmux;
       };
-      overlays = final: prev: {
-        tmux = mkTmux fullConf;
+      overlays.default = final: prev: {
+        tmux = packages.default;
       };
     };
   in
