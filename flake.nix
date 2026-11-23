@@ -33,7 +33,7 @@
       in
         config:
           pkgs.stdenv.mkDerivation {
-            name = "tmux-custom";
+            name = "tmux";
 
             nativeBuildInputs = [pkgs.makeWrapper];
             phases = ["installPhase"];
